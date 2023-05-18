@@ -1,0 +1,47 @@
+---
+- name: Install Nginx and Python
+  hosts: all
+  become: true
+  gather_facts: false
+
+  handlers:
+    - name: Restart nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
+      become: true
+  tasks:
+    - name: Gather facts, but in a smart way
+      block:
+        - name: Gather facts
+          ansible.builtin.gather_facts:
+      rescue:
+        - name: Install Python
+          ansible.builtin.raw: apt update && apt install -y python3
+        - name: Gather facts
+          ansible.builtin.gather_facts:
+      always:
+        - name: Debug
+          ansible.builtin.debug:
+            var: ansible_pkg_mgr
+
+    - name: Install nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+
+    - name: Create Nginx config
+      ansible.builtin.template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+      notify: Restart nginx
+
+   
+
+    - name: Get Nginx version
+      ansible.builtin.command: nginx -v
+      register: nginx_version
+
+    - name: Show Nginx version
+      ansible.builtin.debug:
+        var: nginx_version.stderr_lines[0]

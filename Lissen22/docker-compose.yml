@@ -1,0 +1,6 @@
+version: "3"
+services:
+  debian:
+    image: debian:11-slim
+    container_name: debian-1
+    command: tail -f /dev/null

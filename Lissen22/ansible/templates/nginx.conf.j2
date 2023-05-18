@@ -1,0 +1,7 @@
+server {
+    listen 80;
+    server_name localhost;
+    location / {
+        return 200 "Hostname: {{ ansible_hostname }}\nVirtualization: {{ ansible_virtualization_type }}\nPackage Manager: {{ ansible_pkg_mgr }}\n";
+    }
+}
